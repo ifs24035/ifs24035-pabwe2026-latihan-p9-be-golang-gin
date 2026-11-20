@@ -1,0 +1,766 @@
+{
+  "api_name": "Delcom Todolist REST API (Golang Gin)",
+  "base_url": "http://localhost:7071/api",
+  "version": "1.0.0",
+  "description": "Dokumentasi contoh representatif request & response untuk seluruh endpoint API Backend Todolist Golang Gin.",
+  "endpoints": [
+    {
+      "name": "Register Pengguna",
+      "method": "POST",
+      "endpoint": "/api/auth/register",
+      "description": "Mendaftarkan pengguna baru (role default: member).",
+      "auth_required": false,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Budi Santoso",
+          "username": "budisantoso",
+          "password": "Password123!"
+        }
+      },
+      "response_success": {
+        "status_code": 201,
+        "body": {
+          "status": "success",
+          "message": "Registrasi berhasil",
+          "data": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoibWVtYmVyIn0...",
+            "user": {
+              "id": 2,
+              "name": "Budi Santoso",
+              "username": "budisantoso",
+              "role": "member",
+              "created_at": "2026-11-16T08:00:00Z",
+              "updated_at": "2026-11-16T08:00:00Z"
+            }
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 400,
+        "body": {
+          "status": "fail",
+          "message": "Username sudah terdaftar"
+        }
+      }
+    },
+    {
+      "name": "Login Pengguna",
+      "method": "POST",
+      "endpoint": "/api/auth/login",
+      "description": "Autentikasi akun pengguna menggunakan username dan password.",
+      "auth_required": false,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "username": "budisantoso",
+          "password": "Password123!"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Login berhasil",
+          "data": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoibWVtYmVyIn0...",
+            "user": {
+              "id": 2,
+              "name": "Budi Santoso",
+              "username": "budisantoso",
+              "role": "member",
+              "created_at": "2026-11-16T08:00:00Z",
+              "updated_at": "2026-11-16T08:00:00Z"
+            }
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 401,
+        "body": {
+          "status": "fail",
+          "message": "Username atau password salah"
+        }
+      }
+    },
+    {
+      "name": "Logout Pengguna",
+      "method": "POST",
+      "endpoint": "/api/auth/logout",
+      "description": "Menghapus sesi login klien.",
+      "auth_required": false,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Logout berhasil"
+        }
+      },
+      "response_error": {
+        "status_code": 500,
+        "body": {
+          "status": "error",
+          "message": "Internal server error"
+        }
+      }
+    },
+    {
+      "name": "Ambil Profil Pengguna",
+      "method": "GET",
+      "endpoint": "/api/auth/profile",
+      "description": "Mendapatkan data profil pengguna yang sedang login.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Profil berhasil dimuat",
+          "data": {
+            "id": 2,
+            "name": "Budi Santoso",
+            "username": "budisantoso",
+            "role": "member",
+            "created_at": "2026-11-16T08:00:00Z",
+            "updated_at": "2026-11-16T08:00:00Z"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 401,
+        "body": {
+          "status": "fail",
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "name": "Perbarui Profil Pengguna",
+      "method": "PUT",
+      "endpoint": "/api/auth/profile",
+      "description": "Mengubah nama atau password pengguna yang sedang login.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Budi Santoso M.Kom",
+          "password": "NewPassword2026!"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Profil berhasil diperbarui",
+          "data": {
+            "id": 2,
+            "name": "Budi Santoso M.Kom",
+            "username": "budisantoso",
+            "role": "member",
+            "updated_at": "2026-11-16T08:15:00Z"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 400,
+        "body": {
+          "status": "fail",
+          "message": "Validasi gagal: Nama tidak boleh kosong"
+        }
+      }
+    },
+    {
+      "name": "Daftar Template Publik",
+      "method": "GET",
+      "endpoint": "/api/templates",
+      "description": "Melihat galeri template todo yang dapat diakses publik tanpa login.",
+      "auth_required": false,
+      "request": {
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Daftar template berhasil dimuat",
+          "data": [
+            {
+              "id": 1,
+              "title": "Onboarding Developer Go",
+              "description": "Langkah awal setup lingkungan dev dan repository",
+              "item_count": 5,
+              "is_public": true,
+              "created_at": "2026-11-15T10:00:00Z"
+            }
+          ]
+        }
+      },
+      "response_error": {
+        "status_code": 500,
+        "body": {
+          "status": "error",
+          "message": "Gagal memuat template"
+        }
+      }
+    },
+    {
+      "name": "Detail Template Publik",
+      "method": "GET",
+      "endpoint": "/api/templates/:id",
+      "description": "Melihat rincian template todo beserta daftar item tugasnya.",
+      "auth_required": false,
+      "request": {
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Detail template berhasil dimuat",
+          "data": {
+            "id": 1,
+            "title": "Onboarding Developer Go",
+            "description": "Langkah awal setup lingkungan dev dan repository",
+            "items": [
+              {
+                "title": "Install Go 1.24",
+                "description": "Download dari https://golang.org dan verifikasi PATH"
+              },
+              {
+                "title": "Clone Repository",
+                "description": "Clone repo dan jalankan go mod download"
+              }
+            ]
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 404,
+        "body": {
+          "status": "fail",
+          "message": "Template tidak ditemukan"
+        }
+      }
+    },
+    {
+      "name": "Salin / Clone Template ke Akun",
+      "method": "POST",
+      "endpoint": "/api/templates/:id/clone",
+      "description": "Menyalin seluruh isi template publik ke daftar tugas todo milik pengguna yang login.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "Content-Type": "application/json"
+        }
+      },
+      "response_success": {
+        "status_code": 201,
+        "body": {
+          "status": "success",
+          "message": "Template berhasil disalin ke tugas Anda",
+          "data": {
+            "cloned_items_count": 5,
+            "group_title": "Onboarding Developer Go (Salinan)"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 404,
+        "body": {
+          "status": "fail",
+          "message": "Template tidak ditemukan"
+        }
+      }
+    },
+    {
+      "name": "Daftar Tugas Todo Saya",
+      "method": "GET",
+      "endpoint": "/api/todos",
+      "description": "Mengambil semua daftar tugas todo milik pengguna dengan filter grup, status, dan pencarian.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        },
+        "query_params": {
+          "group_id": "1",
+          "status": "pending",
+          "search": "React"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Data todo berhasil dimuat",
+          "data": [
+            {
+              "id": 10,
+              "user_id": 2,
+              "group_id": 1,
+              "title": "Pelajari React Components & Hooks",
+              "description": "Implementasi useState dan useEffect",
+              "status": "pending",
+              "due_date": "2026-11-20T23:59:00Z",
+              "created_at": "2026-11-16T08:00:00Z",
+              "updated_at": "2026-11-16T08:00:00Z"
+            }
+          ]
+        }
+      },
+      "response_error": {
+        "status_code": 401,
+        "body": {
+          "status": "fail",
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "name": "Tambah Tugas Todo Baru",
+      "method": "POST",
+      "endpoint": "/api/todos",
+      "description": "Membuat tugas todo baru untuk pengguna yang sedang login.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "title": "Membaca Panduan Docker & Jenkins",
+          "description": "Pelajari pipeline CI/CD berbasis container",
+          "group_id": 1,
+          "status": "pending",
+          "due_date": "2026-11-25T17:00:00Z"
+        }
+      },
+      "response_success": {
+        "status_code": 201,
+        "body": {
+          "status": "success",
+          "message": "Todo berhasil dibuat",
+          "data": {
+            "id": 11,
+            "user_id": 2,
+            "group_id": 1,
+            "title": "Membaca Panduan Docker & Jenkins",
+            "description": "Pelajari pipeline CI/CD berbasis container",
+            "status": "pending",
+            "due_date": "2026-11-25T17:00:00Z",
+            "created_at": "2026-11-16T08:30:00Z",
+            "updated_at": "2026-11-16T08:30:00Z"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 400,
+        "body": {
+          "status": "fail",
+          "message": "Judul tugas wajib diisi"
+        }
+      }
+    },
+    {
+      "name": "Statistik Tugas Todo",
+      "method": "GET",
+      "endpoint": "/api/todos/stats",
+      "description": "Mendapatkan ringkasan jumlah tugas total, selesai, dan tertunda.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Statistik berhasil dimuat",
+          "data": {
+            "total": 12,
+            "completed": 5,
+            "pending": 7
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 401,
+        "body": {
+          "status": "fail",
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "name": "Detail Tugas Todo",
+      "method": "GET",
+      "endpoint": "/api/todos/:id",
+      "description": "Mengambil rincian tugas todo berdasarkan ID.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Todo berhasil dimuat",
+          "data": {
+            "id": 10,
+            "user_id": 2,
+            "group_id": 1,
+            "title": "Pelajari React Components & Hooks",
+            "description": "Implementasi useState dan useEffect",
+            "status": "pending",
+            "due_date": "2026-11-20T23:59:00Z",
+            "created_at": "2026-11-16T08:00:00Z",
+            "updated_at": "2026-11-16T08:00:00Z"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 404,
+        "body": {
+          "status": "fail",
+          "message": "Todo tidak ditemukan"
+        }
+      }
+    },
+    {
+      "name": "Perbarui Tugas Todo",
+      "method": "PUT",
+      "endpoint": "/api/todos/:id",
+      "description": "Mengubah judul, deskripsi, tanggal tenggat, atau grup dari suatu todo.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "title": "Pelajari React 19 Server Actions",
+          "description": "Pahami arsitektur modern react",
+          "group_id": 1,
+          "status": "pending",
+          "due_date": "2026-11-22T23:59:00Z"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Todo berhasil diperbarui",
+          "data": {
+            "id": 10,
+            "title": "Pelajari React 19 Server Actions",
+            "description": "Pahami arsitektur modern react",
+            "group_id": 1,
+            "status": "pending",
+            "due_date": "2026-11-22T23:59:00Z",
+            "updated_at": "2026-11-16T08:35:00Z"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 404,
+        "body": {
+          "status": "fail",
+          "message": "Todo tidak ditemukan"
+        }
+      }
+    },
+    {
+      "name": "Ubah Status Tugas Todo",
+      "method": "PATCH",
+      "endpoint": "/api/todos/:id/status",
+      "description": "Mengubah status pengerjaan tugas (misal: pending ke completed).",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "status": "completed"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Status todo berhasil diubah",
+          "data": {
+            "id": 10,
+            "status": "completed",
+            "updated_at": "2026-11-16T08:40:00Z"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 400,
+        "body": {
+          "status": "fail",
+          "message": "Status tidak valid, gunakan 'pending' atau 'completed'"
+        }
+      }
+    },
+    {
+      "name": "Hapus Tugas Todo",
+      "method": "DELETE",
+      "endpoint": "/api/todos/:id",
+      "description": "Menghapus item tugas todo secara permanen.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Todo berhasil dihapus"
+        }
+      },
+      "response_error": {
+        "status_code": 404,
+        "body": {
+          "status": "fail",
+          "message": "Todo tidak ditemukan"
+        }
+      }
+    },
+    {
+      "name": "Daftar Kelompok / Grup Todo",
+      "method": "GET",
+      "endpoint": "/api/todo-groups",
+      "description": "Mendapatkan seluruh kelompok kategori todo milik pengguna.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Kelompok todo berhasil dimuat",
+          "data": [
+            {
+              "id": 1,
+              "user_id": 2,
+              "name": "Pekerjaan Kantor",
+              "color": "#3B82F6",
+              "created_at": "2026-11-15T09:00:00Z"
+            }
+          ]
+        }
+      },
+      "response_error": {
+        "status_code": 401,
+        "body": {
+          "status": "fail",
+          "message": "Unauthorized"
+        }
+      }
+    },
+    {
+      "name": "Tambah Kelompok Todo Baru",
+      "method": "POST",
+      "endpoint": "/api/todo-groups",
+      "description": "Membuat kelompok kategori todo baru.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Belajar AI & Golang",
+          "color": "#10B981"
+        }
+      },
+      "response_success": {
+        "status_code": 201,
+        "body": {
+          "status": "success",
+          "message": "Kelompok todo berhasil dibuat",
+          "data": {
+            "id": 2,
+            "user_id": 2,
+            "name": "Belajar AI & Golang",
+            "color": "#10B981",
+            "created_at": "2026-11-16T08:45:00Z"
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 400,
+        "body": {
+          "status": "fail",
+          "message": "Nama kelompok todo wajib diisi"
+        }
+      }
+    },
+    {
+      "name": "Generate Todo via AI & Open-Source Search",
+      "method": "POST",
+      "endpoint": "/api/todos/ai-generate",
+      "description": "Menghasilkan rekomendasi daftar todo terstruktur berbasis OpenAI dikombinasikan dengan Open-Source Search Tool (Wikipedia / OpenSearch).",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "prompt": "Rencana belajar Go Gin dan React selama 3 hari",
+          "count": 3,
+          "include_web_search": true
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Rekomendasi todo AI berhasil dihasilkan",
+          "data": {
+            "items": [
+              {
+                "title": "Hari 1: Setup Lingkungan & Routing Gin",
+                "description": "Inisialisasi Go module, buat endpoint ping dan CRUD sederhana dengan middleware",
+                "status": "pending",
+                "source_url": "https://id.wikipedia.org/wiki/Golang"
+              },
+              {
+                "title": "Hari 2: Integrasi PostgreSQL & GORM",
+                "description": "Konfigurasi koneksi database, auto migration, dan repository pattern",
+                "status": "pending",
+                "source_url": "https://id.wikipedia.org/wiki/PostgreSQL"
+              },
+              {
+                "title": "Hari 3: React Single Page Application",
+                "description": "Buat komponen TodoList, konsumsi REST API Gin, dan terapkan TailwindCSS",
+                "status": "pending",
+                "source_url": "https://id.wikipedia.org/wiki/React"
+              }
+            ],
+            "search_sources": [
+              "Golang - Bahasa pemrograman sumber terbuka yang efisien (https://id.wikipedia.org/wiki/Golang)",
+              "React - Pustaka JavaScript deklaratif untuk antarmuka pengguna (https://id.wikipedia.org/wiki/React)"
+            ]
+          }
+        }
+      },
+      "response_error": {
+        "status_code": 400,
+        "body": {
+          "status": "fail",
+          "message": "Prompt wajib diisi"
+        }
+      }
+    },
+    {
+      "name": "Admin: Daftar Seluruh Pengguna",
+      "method": "GET",
+      "endpoint": "/api/admin/users",
+      "description": "Khusus role admin untuk mengelola dan melihat daftar seluruh pengguna terdaftar.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 (Admin Token)"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Daftar pengguna berhasil dimuat",
+          "data": [
+            {
+              "id": 1,
+              "name": "Administrator",
+              "username": "admin",
+              "role": "admin",
+              "created_at": "2026-11-15T00:00:00Z"
+            },
+            {
+              "id": 2,
+              "name": "Budi Santoso",
+              "username": "budisantoso",
+              "role": "member",
+              "created_at": "2026-11-16T08:00:00Z"
+            }
+          ]
+        }
+      },
+      "response_error": {
+        "status_code": 403,
+        "body": {
+          "status": "fail",
+          "message": "Akses ditolak: Memerlukan hak akses admin"
+        }
+      }
+    },
+    {
+      "name": "Admin: Lihat Tugas Todo Milik Pengguna",
+      "method": "GET",
+      "endpoint": "/api/admin/users/:id/todos",
+      "description": "Khusus role admin untuk melihat seluruh daftar tugas todo dari user tertentu.",
+      "auth_required": true,
+      "request": {
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 (Admin Token)"
+        }
+      },
+      "response_success": {
+        "status_code": 200,
+        "body": {
+          "status": "success",
+          "message": "Daftar tugas pengguna berhasil dimuat",
+          "data": [
+            {
+              "id": 10,
+              "user_id": 2,
+              "title": "Pelajari React Components & Hooks",
+              "status": "pending",
+              "created_at": "2026-11-16T08:00:00Z"
+            }
+          ]
+        }
+      },
+      "response_error": {
+        "status_code": 404,
+        "body": {
+          "status": "fail",
+          "message": "Pengguna tidak ditemukan"
+        }
+      }
+    }
+  ]
+}

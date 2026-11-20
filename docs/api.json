@@ -1,0 +1,1112 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Delcom Todolist REST API",
+    "description": "Dokumentasi RESTful API Backend Todolist Golang Gin dengan Feature-First & TDD.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Delcom - Labs"
+    }
+  },
+  "host": "",
+  "basePath": "/",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Format token: Bearer <token_jwt>"
+    }
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register Pengguna Baru",
+        "description": "Mendaftarkan pengguna baru (role default: member).",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Registrasi berhasil",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "400": {
+            "description": "Permintaan tidak valid / validasi gagal"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login Pengguna",
+        "description": "Autentikasi akun pengguna menggunakan username dan password.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          },
+          "401": {
+            "description": "Username atau password salah"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout Pengguna",
+        "description": "Menghapus sesi login klien.",
+        "responses": {
+          "200": {
+            "description": "Logout berhasil"
+          }
+        }
+      }
+    },
+    "/api/auth/profile": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Ambil Profil Pengguna",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profil berhasil dimuat",
+            "schema": {
+              "$ref": "#/definitions/UserProfileResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Update Profil Pengguna",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateProfileRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profil berhasil diperbarui"
+          },
+          "400": {
+            "description": "Validasi gagal"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/templates": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Daftar Template Publik",
+        "description": "Mengambil seluruh template publik yang dapat di-clone atau digunakan oleh semua pengguna.",
+        "responses": {
+          "200": {
+            "description": "Daftar template berhasil dimuat",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoGroup"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/templates/{id}": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Detail Template Publik",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail template berhasil dimuat",
+            "schema": {
+              "$ref": "#/definitions/TodoGroup"
+            }
+          },
+          "404": {
+            "description": "Template tidak ditemukan"
+          }
+        }
+      }
+    },
+    "/api/templates/{id}/clone": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Clone Template Publik",
+        "description": "Menduplikasi template publik beserta seluruh todolist di dalamnya ke akun user yang sedang login.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Template berhasil di-clone",
+            "schema": {
+              "$ref": "#/definitions/TodoGroup"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Template tidak ditemukan"
+          }
+        }
+      }
+    },
+    "/api/todos": {
+      "get": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Daftar Todolist Pengguna",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "description": "Filter status: pending, in_progress, completed"
+          },
+          {
+            "name": "group_id",
+            "in": "query",
+            "type": "integer",
+            "description": "Filter berdasarkan ID group"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "type": "string",
+            "description": "Pencarian kata kunci title/deskripsi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar todos berhasil dimuat",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoItem"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Tambah Todo Baru",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTodoRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Todo berhasil dibuat",
+            "schema": {
+              "$ref": "#/definitions/TodoItem"
+            }
+          },
+          "400": {
+            "description": "Data tidak valid"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/todos/stats": {
+      "get": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Statistik Todolist Pengguna",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistik berhasil dimuat",
+            "schema": {
+              "$ref": "#/definitions/TodoStatsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/todos/{id}": {
+      "get": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Detail Todo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail todo berhasil dimuat",
+            "schema": {
+              "$ref": "#/definitions/TodoItem"
+            }
+          },
+          "404": {
+            "description": "Todo tidak ditemukan"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Perbarui Todo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateTodoRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Todo berhasil diperbarui"
+          },
+          "400": {
+            "description": "Data tidak valid"
+          },
+          "404": {
+            "description": "Todo tidak ditemukan"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Hapus Todo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Todo berhasil dihapus"
+          },
+          "404": {
+            "description": "Todo tidak ditemukan"
+          }
+        }
+      }
+    },
+    "/api/todos/{id}/status": {
+      "patch": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Update Status Todo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateTodoStatusRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status todo berhasil diubah"
+          },
+          "400": {
+            "description": "Status tidak valid"
+          },
+          "404": {
+            "description": "Todo tidak ditemukan"
+          }
+        }
+      }
+    },
+    "/api/todo-groups": {
+      "get": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Daftar Group / Kategori Todo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar group berhasil dimuat",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoGroup"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Tambah Group Baru",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTodoGroupRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Group berhasil dibuat",
+            "schema": {
+              "$ref": "#/definitions/TodoGroup"
+            }
+          }
+        }
+      }
+    },
+    "/api/todo-groups/{id}": {
+      "get": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Detail Group",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/TodoGroup"
+            }
+          },
+          "404": {
+            "description": "Group tidak ditemukan"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Perbarui Group",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateTodoGroupRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Group berhasil diperbarui"
+          },
+          "404": {
+            "description": "Group tidak ditemukan"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Hapus Group",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Group berhasil dihapus"
+          },
+          "404": {
+            "description": "Group tidak ditemukan"
+          }
+        }
+      }
+    },
+    "/api/todos/ai-generate": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "Generate Todo / Breakdown Tugas Otomatis dengan AI",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GenerateTodoRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar rekomendasi todo AI berhasil di-generate",
+            "schema": {
+              "$ref": "#/definitions/GenerateTodoResponse"
+            }
+          },
+          "500": {
+            "description": "Gagal menghasilkan item AI"
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Daftar Pengguna (Admin Only)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar user berhasil dimuat",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserProfileResponse"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Hanya untuk admin"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}/todos": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Lihat Seluruh Todos Pengguna Tertentu (Admin Only)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar todos user berhasil dimuat",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TodoItem"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Hanya untuk admin"
+          },
+          "404": {
+            "description": "User tidak ditemukan"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "RegisterRequest": {
+      "type": "object",
+      "required": [
+        "username",
+        "email",
+        "password"
+      ],
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "budi_santoso"
+        },
+        "email": {
+          "type": "string",
+          "example": "budi@example.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "Password123!"
+        },
+        "role": {
+          "type": "string",
+          "example": "member"
+        }
+      }
+    },
+    "LoginRequest": {
+      "type": "object",
+      "required": [
+        "username",
+        "password"
+      ],
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "budi_santoso"
+        },
+        "password": {
+          "type": "string",
+          "example": "Password123!"
+        }
+      }
+    },
+    "UpdateProfileRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "budi.baru@example.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "NewPassword123!"
+        }
+      }
+    },
+    "UserProfileResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "username": {
+          "type": "string",
+          "example": "budi_santoso"
+        },
+        "email": {
+          "type": "string",
+          "example": "budi@example.com"
+        },
+        "role": {
+          "type": "string",
+          "example": "member"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "AuthResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        },
+        "user": {
+          "$ref": "#/definitions/UserProfileResponse"
+        }
+      }
+    },
+    "TodoItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 10
+        },
+        "user_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "todo_group_id": {
+          "type": "integer",
+          "example": 2
+        },
+        "title": {
+          "type": "string",
+          "example": "Mengerjakan Praktikum PABWE Minggu 9"
+        },
+        "description": {
+          "type": "string",
+          "example": "Implementasi REST API Golang Gin dan CI/CD Jenkins"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "in_progress",
+            "completed"
+          ],
+          "example": "in_progress"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cover_image_path": {
+          "type": "string",
+          "example": ""
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "CreateTodoRequest": {
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "todo_group_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "title": {
+          "type": "string",
+          "example": "Persiapan Rapat Proyek"
+        },
+        "description": {
+          "type": "string",
+          "example": "Mempersiapkan slide dan dokumen requirement"
+        },
+        "status": {
+          "type": "string",
+          "example": "pending"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cover_image_path": {
+          "type": "string",
+          "example": ""
+        }
+      }
+    },
+    "UpdateTodoRequest": {
+      "type": "object",
+      "properties": {
+        "todo_group_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "title": {
+          "type": "string",
+          "example": "Persiapan Rapat Proyek (Revisi)"
+        },
+        "description": {
+          "type": "string",
+          "example": "Slide presentasi sudah selesai disusun"
+        },
+        "status": {
+          "type": "string",
+          "example": "completed"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cover_image_path": {
+          "type": "string",
+          "example": ""
+        }
+      }
+    },
+    "UpdateTodoStatusRequest": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "in_progress",
+            "completed"
+          ],
+          "example": "completed"
+        }
+      }
+    },
+    "TodoGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "user_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "title": {
+          "type": "string",
+          "example": "Template Kuliah Web"
+        },
+        "description": {
+          "type": "string",
+          "example": "Daftar checklist tugas mingguan kuliah"
+        },
+        "is_public": {
+          "type": "boolean",
+          "example": true
+        },
+        "todos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TodoItem"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "CreateTodoGroupRequest": {
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Rencana Skripsi 2026"
+        },
+        "description": {
+          "type": "string",
+          "example": "Checklist progress pengerjaan tugas akhir"
+        },
+        "is_public": {
+          "type": "boolean",
+          "example": false
+        }
+      }
+    },
+    "UpdateTodoGroupRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Rencana Skripsi 2026 (Updated)"
+        },
+        "description": {
+          "type": "string",
+          "example": "Progress revisi bab 1 - 3"
+        },
+        "is_public": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
+    "TodoStatsResponse": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "example": 15
+        },
+        "total_selesai": {
+          "type": "integer",
+          "example": 9
+        },
+        "belum_selesai": {
+          "type": "integer",
+          "example": 6
+        }
+      }
+    },
+    "GenerateTodoRequest": {
+      "type": "object",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "example": "Persiapan peluncuran aplikasi mobile baru"
+        },
+        "count": {
+          "type": "integer",
+          "example": 5
+        },
+        "include_web_search": {
+          "type": "boolean",
+          "example": false
+        }
+      }
+    },
+    "GeneratedTodoItem": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Uji fungsionalitas di perangkat Android dan iOS"
+        },
+        "description": {
+          "type": "string",
+          "example": "Lakukan smoke testing dan regression testing"
+        },
+        "status": {
+          "type": "string",
+          "example": "pending"
+        },
+        "source_url": {
+          "type": "string",
+          "example": ""
+        }
+      }
+    },
+    "GenerateTodoResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GeneratedTodoItem"
+          }
+        },
+        "search_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
